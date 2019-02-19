@@ -1,0 +1,129 @@
+
+uniform mat4 u_MVPMatrix;      // 一个表示组合model、view、projection矩阵的常量
+uniform mat4 u_MVMatrix;       // 一个表示组合model、view矩阵的常量
+uniform vec3 u_LightPos;       // 光源在眼睛空间的位置
+
+attribute vec4 a_Position;     // 我们将要传入的每个顶点的位置信息
+attribute vec4 a_Color;        // 我们将要传入的每个顶点的颜色信息
+attribute vec3 a_Normal;       // 我们将要传入的每个顶点的法线信息
+
+varying vec4 v_Color;          // 这将被传入片段着色器
+
+void main()                    // 顶点着色器入口
+{
+// 将顶点转换成眼睛空间
+   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);
+// 将法线的方向转换成眼睛空间
+   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));
+// 将用于哀减
+   float distance = length(u_LightPos - modelViewVertex);
+// 获取从光源到顶点方向的光线向量
+   vec3 lightVector = normalize(u_LightPos - modelViewVertex);
+// 计算光线矢量和顶点法线的点积，如果法线和光线矢量指向相同的方向，那么它将获得最大的照明
+   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);
+// 根据距离哀减光线
+   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));
+// 将颜色乘以亮度，它将被插入三角形中
+   v_Color = a_Color * diffuse;
+// gl_Position是一个特殊的变量用来存储最终的位置
+// 将顶点乘以矩阵得到标准化屏幕坐标的最终点
+   gl_Position = u_MVPMatrix * a_Position;
+}
+
+
+
+precision mediump float;     // 我们将默认精度设置为中等，我们不需要片段着色器中的高精度
+varying vec4 v_Color;        // 这是从三角形每个片段内插的顶点着色器的颜色
+void main()                  // 片段着色器入口
+{
+   gl_FragColor = v_Color;   // 直接将颜色传递
+}
+
+
+
+
+
+
+uniform mat4 u_MVPMatrix;    // 一个表示组合model、view、projection矩阵的常量
+uniform mat4 u_MVMatrix;     // 一个表示组合model、view矩阵的常量
+
+attribute vec4 a_Position;   // 我们将要传入的每个顶点的位置信息
+attribute vec4 a_Color;      // 我们将要传入的每个顶点的颜色信息
+attribute vec3 a_Normal;     // 我们将要传入的每个顶点的法线信息
+
+varying vec3 v_Position;     
+varying vec4 v_Color;        
+varying vec3 v_Normal;       
+
+// 顶点着色器入口点
+void main() 
+{
+   // 将顶点位置转换成眼睛空间的位置
+   v_Position = vec3(u_MVMatrix * a_Position);
+   // 传入颜色
+   v_Color = a_Color;
+   // 将法线的方向转换在眼睛空间
+   v_Normal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));
+   // gl_Position是一个特殊的变量用来存储最终的位置
+   // 将顶点乘以矩阵得到标准化屏幕坐标的最终点
+   gl_Position = u_MVPMatrix * a_Position;
+}
+
+
+
+
+
+
+
+
+
+
+precision mediump float; //我们将默认精度设置为中等，我们不需要片段着色器中的高精度
+uniform vec3 u_LightPos; // 光源在眼睛空间的位置
+varying vec3 v_Position; // 插入的位置
+varying vec4 v_Color;    // 插入的位置颜色
+varying vec3 v_Normal;   // 插入的位置法线
+void main()              // 片段着色器入口
+{
+   // 将用于哀减
+   float distance = length(u_LightPos - v_Position);
+   // 获取从光源到顶点方向的光线向量
+   vec3 lightVector = normalize(u_LightPos - v_Position);
+   // 计算光线矢量和顶点法线的点积，如果法线和光线矢量指向相同的方向，那么它将获得最大的照明
+   float diffuse = max(dot(v_Normal, lightVector), 0.1);
+   // 根据距离哀减光线
+   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));
+   // 颜色乘以亮度哀减得到最终的颜色
+   gl_FragColor = v_Color * diffuse;
+}
+
+
+
+attribute vec2 a_TexCoordinate;// 我们将要传入的每个顶点的纹理坐标信息
+varying vec2 v_TexCoordinate;  // 这将会传入到片段着色器
+
+void main()
+{
+   // 传入纹理坐标
+   v_TexCoordinate = a_TexCoordinate;
+}
+
+
+
+
+
+uniform sampler2D u_Texture;" +  // 传入纹理
+
+varying vec2 v_TexCoordinate;" + // 插入的纹理坐标
+void main()
+{
+
+   // 计算光线矢量和顶点法线的点积，如果法线和光线矢量指向相同的方向，那么它将获得最大的照明
+   float diffuse = max(dot(v_Normal, lightVector), 0.1);" +
+   // 根据距离哀减光线
+   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));" +
+   // 添加环境照明
+   diffuse = diffuse + 0.3;" +
+   // 颜色乘以亮度哀减和纹理值得到最终的颜色
+   gl_FragColor = v_Color * diffuse * texture2D(u_Texture, v_TexCoordinate);" +
+}
