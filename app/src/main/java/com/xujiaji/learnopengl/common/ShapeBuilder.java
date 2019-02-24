@@ -78,4 +78,40 @@ public class ShapeBuilder
 
 		return cubeData;
 	}
+
+	public static float[] generateCubeNormalData() {
+		final float[] normals = {
+				 0.0F,  0.0F,  1.0F, // front
+				 1.0F,  0.0F,  0.0F, // right
+				 0.0F,  0.0F, -1.0F, // back
+				-1.0F,  0.0F,  0.0F, // left
+				 0.0F,  1.0F,  0.0F, // top
+				 0.0F, -1.0F,  0.0F  // bottom
+		};
+
+		final float[] cubeNormalData = new float[3 * 6 * 6];
+
+		int index = 0;
+		for (int i = 0; i < 6; i++) {
+			for (int j = 0; j < 6; j++) {
+				for (int k = 0; k < 3; k++) {
+					cubeNormalData[index++] = normals[k + i * 3];
+				}
+			}
+		}
+
+		return cubeNormalData;
+	}
+
+	public static float[] generateTextureCoordinateData(float[] coordinate) {
+		final float[] coordinateData = new float[coordinate.length * 6];
+
+		int index = 0;
+		for (int i = 0; i < 6; i++) {
+			for (int j = 0; j < coordinate.length; j++) {
+				coordinateData[index++] = coordinate[j];
+			}
+		}
+		return coordinateData;
+	}
 }
